@@ -1,0 +1,57 @@
+class Solution {
+public:
+    
+    int dp[14][1<<12];
+    int sum[1<<12];
+    int n;
+    int solve(vector<int> &jobs,int k,int mask,int x,int start)
+    {
+        if(x>k && mask==0)
+        {
+            return 0;
+        }
+
+        if(mask==0 && x<=k)
+            return -1;
+        if(mask!=0 && x>k)
+            return INT_MAX;
+
+
+        int ans=INT_MAX;
+        for(int b=start;b<(1<<n);b++)
+        {
+            if((b&mask)==b)
+            {
+                int ret;
+                int y=mask^b;
+                if(dp[x+1][y]!=-1)
+                {
+                    ret=max(sum[b],dp[x+1][y]);
+                }
+                 else
+                  ret=max(sum[b],solve(jobs,k,y,x+1,b+1));
+                ans=min(ans,ret);
+            }
+            else
+                continue;
+        }
+
+        return  dp[x][mask]=ans;
+    }
+    int minimumTimeRequired(vector<int>& jobs, int k) {
+        memset(dp,-1,sizeof dp);
+       // cout<<dp[0][0];
+        n=jobs.size();
+         for(int b=1;b<(1<<n);b++)
+         {
+                sum[b]=0;
+                for(int i=0;i<n;i++)
+                {
+                    if((1<<i)& b)
+                    sum[b]+=jobs[i];
+                }
+         }
+        int ans=solve(jobs,k,(1<<n)-1,1,1);
+        return ans;
+    }
+};
